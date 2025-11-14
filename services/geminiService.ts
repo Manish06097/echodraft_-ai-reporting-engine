@@ -44,10 +44,10 @@ You must think like a radiologist, analyzing the transcript to extract and synth
 
 
 export async function* refineReport(currentReport: string, instruction: string) {
-  if (!process.env.API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     throw new Error("API_KEY environment variable not set");
   }
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   const userPrompt = `
 Here is the current report:
@@ -74,10 +74,10 @@ Please provide the full, revised Markdown report.
 }
 
 export async function* generateReportFromText(notes: string, templateStyle?: string) {
-  if (!process.env.API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     throw new Error("API_KEY environment variable not set");
   }
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   const userPromptParts = [
     { text: "Here is the transcript:\n---\n" },

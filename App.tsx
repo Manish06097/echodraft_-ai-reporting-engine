@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { refineReport, generateReportFromText } from './services/geminiService';
-import { generateQwenReportFromText } from './services/qwenService';
+import { generateQwenReportFromText, refineQwenReport } from './services/qwenService';
 import SideBySideReportViewer from './components/SideBySideReportViewer';
 import { WandIcon, Spinner } from './components/icons';
 import TemplateUploader from './components/TemplateUploader';
@@ -83,10 +83,45 @@ function App() {
 
 
   const handleRefine = useCallback(async () => {
-    // This function would need to be adapted for side-by-side refining,
-    // which is out of the current scope.
-    console.log("Refining side-by-side reports is not yet implemented.");
-  }, []);
+    if (!editInstruction.trim()) return;
+
+    setAppState('refining');
+    setError(null);
+    setStreamingGeminiReport('');
+    setStreamingQwenReport('');
+
+    try {
+      const geminiStream = refineReport(geminiReport, editInstruction);
+      const qwenStream = refineQwenReport(qwenReport, editInstruction);
+
+      const processStream = async (stream: AsyncGenerator<string>, setStreamingReport: (report: string) => void) => {
+        let fullStreamedText = '';
+        for await (const chunk of stream) {
+          fullStreamedText += chunk;
+          setStreamingReport(fullStreamedText);
+        }
+        return fullStreamedText;
+      };
+
+      const [geminiResult, qwenResult] = await Promise.all([
+        processStream(geminiStream, setStreamingGeminiReport),
+        processStream(qwenStream, setStreamingQwenReport)
+      ]);
+
+      const { reportText: geminiReportText, keywords: geminiKeywords } = processReportAndKeywords(geminiResult);
+      const { reportText: qwenReportText, keywords: qwenKeywords } = processReportAndKeywords(qwenResult);
+
+      setGeminiReport(geminiReportText);
+      setQwenReport(qwenReportText);
+      setGeminiKeywords(geminiKeywords);
+      setQwenKeywords(qwenKeywords);
+      setEditInstruction('');
+      setAppState('editing');
+    } catch (e: any) {
+      setError(`Failed to refine report: ${e.message}`);
+      setAppState('editing');
+    }
+  }, [editInstruction, geminiReport, qwenReport]);
 
   const renderContent = () => {
     switch (appState) {

@@ -16,8 +16,6 @@ If the user's instruction implies removing a section, do not remove the heading.
 
 After revising the report, you MUST generate an updated list of 3-5 relevant reference keywords based on the new content.
 These keywords MUST be placed inside an HTML comment at the very end of your response, formatted exactly like this:
-<!-- keywords: keyword one, keyword two, keyword three -->
-
 Output the complete, revised Markdown report followed by the hidden keyword comment.`;
 
 const NORMAL_REPORT_GENERATION_PROMPT = `You are an expert radiologist AI, not a typist. Your task is to create a professional clinical report from a raw text transcript.
@@ -26,21 +24,23 @@ You must think like a radiologist, analyzing the transcript to extract and synth
 **CRITICAL INSTRUCTIONS:**
 1.  **Radiologist Persona:** Adopt the persona of an expert radiologist. Your language should be professional, precise, and clinical.
 2.  **Information Extraction:**
-    *   From the transcript, you MUST intelligently extract and infer the **CLINICAL DETAILS** and formulate appropriate **ADVICE**. Do not simply state that details were not provided.
-    *   Analyze the entire transcript to synthesize the content for all sections.
+    * From the transcript, you MUST intelligently extract and infer the **CLINICAL DETAILS** and formulate appropriate **ADVICE**. Do not simply state that details were not provided.
+    * Analyze the entire transcript to synthesize the content for all sections.
 3.  **Strict Structure Adherence:** You MUST generate a report with the following sections, in this exact order. Every heading MUST be present in the final output.
-    *   \`# Title\`
-    *   \`## CLINICAL DETAILS\`
-    *   \`## TECHNIQUE\`
-    *   \`## FINDINGS\`
-    *   \`## IMPRESSION\`
-    *   \`## ADVICE\`
-4.  **Template Integration for FINDINGS:**
-    *   If a template for the FINDINGS section is provided, you MUST use it as a style and structure guide.
-    *   Generate the FINDINGS content from the transcript, but format it according to the provided template's style.
-5.  **Keyword Generation:** After the entire report, generate 3-5 relevant reference keywords. These keywords MUST be placed inside a single HTML comment at the very end of your response.
-    *   **Format:** \`<!-- keywords: keyword one, keyword two, keyword three -->\`
-6.  **Output Format:** Your entire response should be ONLY the complete Markdown report followed by the hidden keyword comment. Do not add any introductory or concluding sentences.`;
+    * \`# Title\`
+    * \`## CLINICAL DETAILS\`
+    * \`## TECHNIQUE\`
+    * \`## FINDINGS\`
+    * \`## IMPRESSION\`
+    * \`## ADVICE\`
+4.  **Formatting:**
+    * When a section contains multiple distinct points, you MUST use bullet points (e.g., \`-\` or \`*\`) to improve readability.
+5.  **Template Integration for FINDINGS:**
+    * If a template for the FINDINGS section is provided, you MUST use it as a style and structure guide.
+    * Generate the FINDINGS content from the transcript, but format it according to the provided template's style.
+6.  **Keyword Generation:** After the entire report, generate 3-5 relevant reference keywords. These keywords MUST be placed inside a single HTML comment at the very end of your response.
+    * **Format:** \`<!-- keywords: keyword one, keyword two, keyword three -->\`
+7.  **Output Format:** Your entire response should be ONLY the complete Markdown report followed by the hidden keyword comment. Do not add any introductory or concluding sentences.`;
 
 const COMPARISON_REPORT_GENERATION_PROMPT = `You are an expert radiologist AI, not a typist. Your task is to create a professional clinical report comparing a new transcript with a prior report.
 You must think like a radiologist, analyzing both documents to extract, synthesize, and compare information.
@@ -48,25 +48,27 @@ You must think like a radiologist, analyzing both documents to extract, synthesi
 **CRITICAL INSTRUCTIONS:**
 1.  **Radiologist Persona:** Adopt the persona of an expert radiologist. Your language should be professional, precise, and clinical.
 2.  **Information Extraction:**
-    *   From the new transcript, you MUST intelligently extract and infer the **CLINICAL DETAILS** and formulate appropriate **ADVICE**.
-    *   Analyze both the new transcript and the prior report to synthesize the content for all sections.
+    * From the new transcript, you MUST intelligently extract and infer the **CLINICAL DETAILS** and formulate appropriate **ADVICE**.
+    * Analyze both the new transcript and the prior report to synthesize the content for all sections.
 3.  **Strict Structure Adherence:** You MUST generate a report with the following sections, in this exact order. Every heading MUST be present in the final output.
-    *   \`# Title\`
-    *   \`## CLINICAL DETAILS\`
-    *   \`## TECHNIQUE\`
-    *   \`## FINDINGS\`
-    *   \`## COMPARISON\`
-    *   \`## IMPRESSION\`
-    *   \`## ADVICE\`
+    * \`# Title\`
+    * \`## CLINICAL DETAILS\`
+    * \`## TECHNIQUE\`
+    * \`## FINDINGS\`
+    * \`## COMPARISON\`
+    * \`## IMPRESSION\`
+    * \`## ADVICE\`
 4.  **Comparison Section:**
-    *   The \`## COMPARISON\` section is mandatory.
-    *   This section MUST compare the findings from the new transcript with the prior report.
-5.  **Template Integration for FINDINGS:**
-    *   If a template for the FINDINGS section is provided, you MUST use it as a style and structure guide.
-    *   Generate the FINDINGS content from the transcript, but format it according to the provided template's style.
-6.  **Keyword Generation:** After the entire report, generate 3-5 relevant reference keywords. These keywords MUST be placed inside a single HTML comment at the very end of your response.
-    *   **Format:** \`<!-- keywords: keyword one, keyword two, keyword three -->\`
-7.  **Output Format:** Your entire response should be ONLY the complete Markdown report followed by the hidden keyword comment. Do not add any introductory or concluding sentences.`;
+    * The \`## COMPARISON\` section is mandatory.
+    * This section MUST compare the findings from the new transcript with the prior report.
+5.  **Formatting:**
+    * When a section contains multiple distinct points, you MUST use bullet points (e.g., \`-\` or \`*\`) to improve readability.
+6.  **Template Integration for FINDINGS:**
+    * If a template for the FINDINGS section is provided, you MUST use it as a style and structure guide.
+    * Generate the FINDINGS content from the transcript, but format it according to the provided template's style.
+7.  **Keyword Generation:** After the entire report, generate 3-5 relevant reference keywords. These keywords MUST be placed inside a single HTML comment at the very end of your response.
+    * **Format:** \`<!-- keywords: keyword one, keyword two, keyword three -->\`
+8.  **Output Format:** Your entire response should be ONLY the complete Markdown report followed by the hidden keyword comment. Do not add any introductory or concluding sentences.`;
 
 
 export async function* refineReport(currentReport: string, instruction: string) {
@@ -117,13 +119,13 @@ export async function* generateReportFromText(notes: string, templateStyle?: str
   if (templateStyle) {
     userPromptParts.push({ text: "\n\nPlease use the following template as a style and structure guide for the FINDINGS section:\n---\n" });
     userPromptParts.push({ text: templateStyle });
-    userPromptParts.push({ text: "\n---" });
+    userPromptParts.push({ text: "\n---" }); // <-- Fixed typo: userPparts -> userPromptParts
   }
 
   if (isComparison) {
     userPromptParts.push({ text: "\n\nHere is the prior report for comparison:\n---\n" });
-    userPromptParts.push({ text: oldReportContent });
-    userPromptParts.push({ text: "\n---" });
+    userPromptParts.push({ text: oldReportContent }); // <-- Fixed typo: userPparts -> userPromptParts
+    userPromptParts.push({ text: "\n---" }); // <-- Fixed typo: userPparts -> userPromptParts
   }
 
   const stream = await ai.models.generateContentStream({

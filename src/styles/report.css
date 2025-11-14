@@ -1,0 +1,38 @@
+/* Custom styles for the generated report */
+.report-container h1 {
+  font-size: 2.5em;
+  margin-bottom: 0.5em;
+  border-bottom: 2px solid #4a5568;
+  padding-bottom: 0.3em;
+}
+
+.report-container h2 {
+  font-size: 1.75em;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  border-bottom: 1px solid #4a5568;
+  padding-bottom: 0.2em;
+}
+
+.report-container p {
+  line-height: 1.6;
+  margin-bottom: 1em;
+}
+
+.report-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5em;
+}
+
+.report-container th,
+.report-container td {
+  border: 1px solid #4a5568;
+  padding: 0.75em;
+  text-align: left;
+}
+
+.report-container th {
+  background-color: #2d3748;
+  font-weight: bold;
+}

@@ -1,0 +1,5 @@
+{
+  "name": "EchoDraft: AI Reporting Engine",
+  "description": "A unified, high-performance web application designed to transform unstructured voice dictations into professional, structured Markdown reports using Google Gemini.",
+  "requestFramePermissions": []
+}

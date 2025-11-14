@@ -20,7 +20,7 @@ These keywords MUST be placed inside an HTML comment at the very end of your res
 
 Output the complete, revised Markdown report followed by the hidden keyword comment.`;
 
-const REPORT_GENERATION_PROMPT = `You are an expert radiologist AI, not a typist. Your task is to create a professional clinical report from a raw text transcript.
+const NORMAL_REPORT_GENERATION_PROMPT = `You are an expert radiologist AI, not a typist. Your task is to create a professional clinical report from a raw text transcript.
 You must think like a radiologist, analyzing the transcript to extract and synthesize information for the report.
 
 **CRITICAL INSTRUCTIONS:**
@@ -42,12 +42,38 @@ You must think like a radiologist, analyzing the transcript to extract and synth
     *   **Format:** \`<!-- keywords: keyword one, keyword two, keyword three -->\`
 6.  **Output Format:** Your entire response should be ONLY the complete Markdown report followed by the hidden keyword comment. Do not add any introductory or concluding sentences.`;
 
+const COMPARISON_REPORT_GENERATION_PROMPT = `You are an expert radiologist AI, not a typist. Your task is to create a professional clinical report comparing a new transcript with a prior report.
+You must think like a radiologist, analyzing both documents to extract, synthesize, and compare information.
+
+**CRITICAL INSTRUCTIONS:**
+1.  **Radiologist Persona:** Adopt the persona of an expert radiologist. Your language should be professional, precise, and clinical.
+2.  **Information Extraction:**
+    *   From the new transcript, you MUST intelligently extract and infer the **CLINICAL DETAILS** and formulate appropriate **ADVICE**.
+    *   Analyze both the new transcript and the prior report to synthesize the content for all sections.
+3.  **Strict Structure Adherence:** You MUST generate a report with the following sections, in this exact order. Every heading MUST be present in the final output.
+    *   \`# Title\`
+    *   \`## CLINICAL DETAILS\`
+    *   \`## TECHNIQUE\`
+    *   \`## FINDINGS\`
+    *   \`## COMPARISON\`
+    *   \`## IMPRESSION\`
+    *   \`## ADVICE\`
+4.  **Comparison Section:**
+    *   The \`## COMPARISON\` section is mandatory.
+    *   This section MUST compare the findings from the new transcript with the prior report.
+5.  **Template Integration for FINDINGS:**
+    *   If a template for the FINDINGS section is provided, you MUST use it as a style and structure guide.
+    *   Generate the FINDINGS content from the transcript, but format it according to the provided template's style.
+6.  **Keyword Generation:** After the entire report, generate 3-5 relevant reference keywords. These keywords MUST be placed inside a single HTML comment at the very end of your response.
+    *   **Format:** \`<!-- keywords: keyword one, keyword two, keyword three -->\`
+7.  **Output Format:** Your entire response should be ONLY the complete Markdown report followed by the hidden keyword comment. Do not add any introductory or concluding sentences.`;
+
 
 export async function* refineReport(currentReport: string, instruction: string) {
-  if (!process.env.GEMINI_API_KEY) {
+  if (!process.env.API_KEY) {
     throw new Error("API_KEY environment variable not set");
   }
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const userPrompt = `
 Here is the current report:
@@ -73,11 +99,14 @@ Please provide the full, revised Markdown report.
   }
 }
 
-export async function* generateReportFromText(notes: string, templateStyle?: string) {
-  if (!process.env.GEMINI_API_KEY) {
+export async function* generateReportFromText(notes: string, templateStyle?: string, oldReportContent?: string) {
+  if (!process.env.API_KEY) {
     throw new Error("API_KEY environment variable not set");
   }
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+  const isComparison = !!oldReportContent;
+  const systemInstruction = isComparison ? COMPARISON_REPORT_GENERATION_PROMPT : NORMAL_REPORT_GENERATION_PROMPT;
 
   const userPromptParts = [
     { text: "Here is the transcript:\n---\n" },
@@ -91,6 +120,12 @@ export async function* generateReportFromText(notes: string, templateStyle?: str
     userPromptParts.push({ text: "\n---" });
   }
 
+  if (isComparison) {
+    userPromptParts.push({ text: "\n\nHere is the prior report for comparison:\n---\n" });
+    userPromptParts.push({ text: oldReportContent });
+    userPromptParts.push({ text: "\n---" });
+  }
+
   const stream = await ai.models.generateContentStream({
     model: 'gemini-2.5-pro',
     contents: [{ 
@@ -98,7 +133,7 @@ export async function* generateReportFromText(notes: string, templateStyle?: str
       parts: userPromptParts
     }],
     config: {
-        systemInstruction: REPORT_GENERATION_PROMPT
+        systemInstruction
     }
   });
 

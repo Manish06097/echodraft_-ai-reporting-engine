@@ -3,6 +3,7 @@ import { refineReport, generateReportFromText } from './services/geminiService';
 import HtmlReportViewer from './components/HtmlReportViewer';
 import { WandIcon, Spinner } from './components/icons';
 import TemplateUploader from './components/TemplateUploader';
+import OldReportUploader from './components/OldReportUploader';
 
 type AppState = 'idle' | 'generating' | 'editing' | 'refining';
 
@@ -27,6 +28,7 @@ function App() {
   const [report, setReport] = useState<string>('');
   const [streamingReport, setStreamingReport] = useState<string>('');
   const [templateContent, setTemplateContent] = useState<string>('');
+  const [oldReportContent, setOldReportContent] = useState<string>('');
   const [editInstruction, setEditInstruction] = useState<string>('');
   const [referenceKeywords, setReferenceKeywords] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +44,7 @@ function App() {
 
     try {
       let fullStreamedText = '';
-      const stream = generateReportFromText(initialNotes, templateContent);
+      const stream = generateReportFromText(initialNotes, templateContent, oldReportContent);
       
       for await (const chunk of stream) {
         fullStreamedText += chunk;
@@ -96,7 +98,10 @@ function App() {
             <p className="text-slate-400 text-lg max-w-2xl">
               Paste your raw notes, transcript, or a rough draft below. The AI will structure it into a professional, well-formatted clinical report.
             </p>
-            <TemplateUploader onTemplateUpload={setTemplateContent} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TemplateUploader onTemplateUpload={setTemplateContent} />
+              <OldReportUploader onReportUpload={setOldReportContent} />
+            </div>
             <textarea
               value={initialNotes}
               onChange={(e) => setInitialNotes(e.target.value)}

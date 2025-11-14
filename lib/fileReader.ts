@@ -1,4 +1,5 @@
 import mammoth from 'mammoth';
+import * as pdf from 'pdf-parse';
 
 export async function readFileContent(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -6,16 +7,21 @@ export async function readFileContent(file: File): Promise<string> {
 
     reader.onload = async (event) => {
       if (event.target?.result) {
-        if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-          try {
-            const arrayBuffer = event.target.result as ArrayBuffer;
+        try {
+          const arrayBuffer = event.target.result as ArrayBuffer;
+          if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
             const result = await mammoth.extractRawText({ arrayBuffer });
             resolve(result.value);
-          } catch (error) {
-            reject('Error reading .docx file');
+          } else if (file.type === 'application/pdf') {
+            const data = await (pdf as any).default(Buffer.from(arrayBuffer));
+            resolve(data.text);
+          } else {
+            // For .txt and other text files
+            const decoder = new TextDecoder();
+            resolve(decoder.decode(arrayBuffer));
           }
-        } else {
-          resolve(event.target.result as string);
+        } catch (error) {
+          reject(`Error reading ${file.name}: ${error}`);
         }
       } else {
         reject('Failed to read file');
@@ -26,10 +32,6 @@ export async function readFileContent(file: File): Promise<string> {
       reject('Error reading file');
     };
 
-    if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-      reader.readAsArrayBuffer(file);
-    } else {
-      reader.readAsText(file);
-    }
+    reader.readAsArrayBuffer(file);
   });
 }

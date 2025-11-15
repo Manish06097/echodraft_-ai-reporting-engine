@@ -40,7 +40,7 @@ You MUST follow these steps in order:
     * I will synthesize all technical details to populate the **TECHNIQUE** and **FINDINGS** sections.
 3.  **Identify Transcript Discrepancies (Critical):**
     * While analyzing the transcript, I will identify any "working errors"—such as misspellings, ambiguities, internal contradictions, or nonsensical clinical statements.
-    * If such an issue is found, I will correct it for the report *and* highlight the *original* problematic text in the final report using special XML tags: **<discrepancy note="Brief explanation of the issue">Original problematic text</discrepancy>**. This is for UI rendering.
+    * If such an issue is found *in the transcript*, I will correct it for the report *and* highlight the *original* problematic text from the transcript in the final report using special XML tags: **<discrepancy note="Brief explanation of the issue">Original problematic text</discrepancy>**. This is for UI rendering. This tag must only be used to highlight errors present in the original user-provided transcript.
 4.  **Apply Template:** If a FINDINGS template is provided, I will use it as a style and structure guide for that section, populating it with information from the transcript.
 5.  **Synthesize Impression:** I will summarize the most critical findings into a concise **IMPRESSION**.
 6.  **Generate Keywords:** I will generate 3-5 relevant reference keywords.
@@ -75,7 +75,7 @@ You MUST follow these steps in order:
     * I will synthesize all technical details from the *new transcript* to populate the **TECHNIQUE** and **FINDINGS** sections.
 3.  **Identify Transcript Discrepancies (Critical):**
     * While analyzing the *new transcript*, I will identify any "working errors"—such as misspellings, ambiguities, internal contradictions, or nonsensical clinical statements.
-    * If such an issue is found, I will correct it for the report *and* highlight the *original* problematic text in the final report using special XML tags: **<discrepancy note="Brief explanation of the issue">Original problematic text</discrepancy>**. This is for UI rendering.
+    * If such an issue is found *in the transcript*, I will correct it for the report *and* highlight the *original* problematic text from the transcript in the final report using special XML tags: **<discrepancy note="Brief explanation of the issue">Original problematic text</discrepancy>**. This is for UI rendering. This tag must only be used to highlight errors present in the original user-provided transcript.
 4.  **Apply Template:** If a FINDINGS template is provided, I will use it as a style and structure guide for that section, populating it with information from the *new transcript*.
 5.  **Perform Comparison:** I will meticulously compare the new findings with the prior report to populate the **COMPARISON** section, noting any changes, stability, or new findings.
 6.  **Synthesize Impression:** I will summarize the most critical findings *and* the comparison results into a concise **IMPRESSION**.

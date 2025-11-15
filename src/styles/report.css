@@ -52,3 +52,16 @@
   font-weight: bold;
   cursor: help;
 }
+
+.custom-tooltip {
+  position: absolute;
+  background-color: #2d3748;
+  color: #e2e8f0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  z-index: 1000;
+  pointer-events: none;
+  font-size: 0.9em;
+  max-width: 300px;
+  border: 1px solid #4a5568;
+}

@@ -225,7 +225,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-900 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(30,150,200,0.3),rgba(255,255,255,0))] text-slate-200 flex flex-col items-center p-4 sm:p-6 md:p-8">
-      <div className="w-full max-w-5xl mx-auto">
+      <div className="w-full mx-auto">
         <header className="text-center mb-12">
           <h1 className="text-5xl sm:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-cyan-300">
             EchoDraft

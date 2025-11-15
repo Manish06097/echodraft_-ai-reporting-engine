@@ -36,3 +36,19 @@
   background-color: #2d3748;
   font-weight: bold;
 }
+
+.report-container ul {
+  list-style-type: disc;
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.report-container li {
+  margin-bottom: 0.5em;
+}
+
+.discrepancy-highlight {
+  color: #ff6b6b;
+  font-weight: bold;
+  cursor: help;
+}
